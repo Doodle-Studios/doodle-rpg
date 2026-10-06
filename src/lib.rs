@@ -1,83 +1,28 @@
-use rand::{prelude::*, rng};
-use std::collections::HashMap;
+pub mod game;
 
-pub struct Tui {
+use game::*;
+use ratatui::{DefaultTerminal, Frame};
+use std::io::Error;
+
+pub struct App {
     exit: bool,
 }
 
-pub trait Entity {
-    fn damage(&mut self, damaging: &Damaging);
-}
-
-pub struct RndDmg(f64, f64);
-impl RndDmg {
-    fn calculate(&self) -> f64 {
-        rng().random_range(self.0..self.1)
-    }
-}
-
-pub enum Effect {
-    DamageMult(RndDmg),
-}
-
-pub enum Damaging<'a> {
-    Weapon(&'a Weapon),
-}
-
-pub struct Weapon {
-    dmg: RndDmg,
-    effects: HashMap<String, Effect>,
-}
-
-impl Weapon {
-    fn new(min: f64, max: f64, effects: HashMap<String, Effect>) -> Weapon {
-        Weapon {
-            dmg: RndDmg(min, max),
-            effects,
+impl App {
+    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<(), Error> {
+        while !self.exit {
+            terminal.draw(|frame| self.draw(frame))?;
         }
+        Ok(())
+    }
+
+    pub fn draw(&self, frame: &mut Frame) {}
+}
+impl App {
+    pub fn new() -> App {
+        App { exit: false }
     }
 }
-
-pub struct Armour {
-    protection: f64,
-    effects: HashMap<String, Effect>,
-}
-
-pub enum Equipment {
-    Weapon(Weapon),
-    Armour(Armour),
-}
-
-pub struct Player {
-    hp: f64,
-    max_hp: f64,
-    xp: f64,
-    equipment: Vec<Equipment>,
-}
-
-impl Entity for Player {
-    fn damage(&mut self, damaging: &Damaging) {
-        match damaging {
-            Damaging::Weapon(weapon) => {
-                let mut final_dmg: f64 = 0.0;
-                final_dmg += weapon.dmg.calculate();
-
-                let mut effect_modifier: f64 = 1.0;
-
-                for (_, effect) in &weapon.effects {
-                    match effect {
-                        Effect::DamageMult(mult) => effect_modifier *= mult.calculate(),
-                    }
-                }
-
-                final_dmg *= effect_modifier;
-
-                self.hp = (self.hp - final_dmg).clamp(0.0f64, self.max_hp);
-            }
-        }
-    }
-}
-
 pub struct Game {
     player: Player,
 }
