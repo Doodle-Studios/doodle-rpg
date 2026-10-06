@@ -19,7 +19,7 @@ enum GameState {
 impl App {
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<(), Error> {
         while !self.exit {
-            terminal.draw(|frame| ui::draw(&self, frame))?;
+            terminal.draw(|frame| ui::draw(self, frame))?;
         }
         Ok(())
     }
@@ -29,6 +29,13 @@ impl App {
         App { exit: false }
     }
 }
+
+impl Default for App {
+    fn default() -> Self {
+        App::new()
+    }
+}
+
 pub struct Game {
     player: Player,
 }
