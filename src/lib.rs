@@ -1,22 +1,28 @@
 pub mod game;
+pub mod saves;
+pub mod ui;
 
 use game::*;
 use ratatui::{DefaultTerminal, Frame};
+use saves::*;
 use std::io::Error;
 
 pub struct App {
     exit: bool,
 }
 
+enum GameState {
+    Title,
+    FileManager,
+}
+
 impl App {
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> Result<(), Error> {
         while !self.exit {
-            terminal.draw(|frame| self.draw(frame))?;
+            terminal.draw(|frame| ui::draw(&self, frame))?;
         }
         Ok(())
     }
-
-    pub fn draw(&self, frame: &mut Frame) {}
 }
 impl App {
     pub fn new() -> App {
