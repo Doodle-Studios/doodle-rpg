@@ -2,7 +2,6 @@ use crate::saves::*;
 use rand::{prelude::*, rng};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::io::Error;
 
 pub trait Entity {
     fn damage(&mut self, damaging: &Damaging);
